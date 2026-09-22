@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Black Box Testing - Sistem Deteksi Malaria{% endblock %}
+{% block content %}
+<section class="page-title reveal">
+  <span class="eyebrow">Pengujian sistem</span>
+  <h1>Black Box Testing</h1>
+  <p>Pengujian berfokus pada input, proses, dan output yang dilihat pengguna pada aplikasi web deteksi malaria.</p>
+</section>
+
+<section class="card reveal">
+  <div class="card-head"><h2>Skenario pengujian utama</h2><span class="badge">uji fungsional</span></div>
+  <div class="table-wrap compact-table">
+    <table>
+      <thead>
+        <tr><th>No</th><th>Fitur</th><th>Skenario</th><th>Input</th><th>Hasil yang diharapkan</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Upload gambar</td><td>Pengguna mengunggah gambar valid</td><td>File JPG atau PNG</td><td>Gambar berhasil diunggah dan siap diproses</td><td><span class="status-ok">Valid</span></td></tr>
+        <tr><td>2</td><td>Validasi format</td><td>Pengguna mengunggah file tidak valid</td><td>File selain gambar</td><td>Sistem menolak file dan menampilkan pesan error</td><td><span class="status-ok">Valid</span></td></tr>
+        <tr><td>3</td><td>Validasi input kosong</td><td>Pengguna menekan tombol tanpa memilih file</td><td>Tidak ada input</td><td>Sistem menampilkan peringatan agar pengguna memilih gambar</td><td><span class="status-ok">Valid</span></td></tr>
+        <tr><td>4</td><td>Proses deteksi</td><td>Pengguna menekan tombol klasifikasi</td><td>Gambar valid</td><td>Sistem menjalankan model YOLOv8 pada citra</td><td><span class="status-ok">Valid</span></td></tr>
+        <tr><td>5</td><td>Hasil deteksi</td><td>Sistem menampilkan output model</td><td>Output prediksi</td><td>Gambar dengan bounding box, label, dan confidence tampil</td><td><span class="status-ok">Valid</span></td></tr>
+        <tr><td>6</td><td>Unduh hasil</td><td>Pengguna menekan tombol unduh</td><td>Gambar hasil deteksi</td><td>Browser mengunduh citra hasil klasifikasi</td><td><span class="status-ok">Valid</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card soft reveal">
+  <div class="card-head"><h2>Kriteria penerimaan</h2><span class="badge">acceptance</span></div>
+  <ul class="nice-list">
+    <li>Aplikasi menerima citra mikroskopis yang valid.</li>
+    <li>Aplikasi menolak input kosong dan format file yang tidak sesuai.</li>
+    <li>Aplikasi menjalankan model YOLOv8 setelah gambar valid diterima.</li>
+    <li>Aplikasi menampilkan bounding box, label jenis Plasmodium, dan nilai confidence.</li>
+    <li>Aplikasi menyediakan unduhan hasil deteksi.</li>
+  </ul>
+</section>
+{% endblock %}

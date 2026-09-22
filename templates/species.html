@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Jenis Malaria - Sistem Deteksi Jenis Malaria{% endblock %}
+{% block content %}
+<section class="page-title reveal">
+  <span class="eyebrow">Ensiklopedia singkat</span>
+  <h1>Kenali lima jenis Plasmodium</h1>
+  <p>Halaman ini menjelaskan kelas yang dapat dikenali oleh model. Pilih salah satu jenis untuk melihat penjelasan lengkap, contoh citra dari dataset, ciri visual, dan cara membaca hasil klasifikasi.</p>
+</section>
+
+<section class="species-grid reveal">
+  {% for cls in species_order %}
+    {% set info = species_info[cls] %}
+    <a class="species-card" href="{{ url_for('species_detail', slug=info.slug) }}" style="--species-color: {{ info.color }}">
+      <div class="species-img-wrap"><img src="{{ url_for('sample_image', class_name=cls) }}" alt="Contoh citra {{ info.title }}" loading="lazy"></div>
+      <div class="species-card-body">
+        <span class="species-chip">{{ cls }}</span>
+        <h2>{{ info.title }}</h2>
+        <p>{{ info.short }}</p>
+        <div class="species-meta-line"><span>Awal {{ info.proposal_count }}</span><span>Akhir {{ info.target_count }}</span></div>
+        <strong class="read-more">Buka penjelasan →</strong>
+      </div>
+    </a>
+  {% endfor %}
+</section>
+
+<section class="card soft reveal info-note-card">
+  <div class="card-head"><h2>Catatan penggunaan</h2><span class="badge">penting</span></div>
+  <p class="muted">Informasi pada halaman ini dibuat untuk mendukung pemahaman aplikasi dan demonstrasi penelitian. Hasil klasifikasi dari sistem tidak boleh digunakan sebagai diagnosis tunggal, karena keputusan medis tetap memerlukan pemeriksaan laboratorium dan tenaga kesehatan yang berwenang.</p>
+</section>
+{% endblock %}

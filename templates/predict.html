@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Klasifikasi Malaria - Sistem Deteksi Jenis Malaria{% endblock %}
+{% block content %}
+<section class="page-title reveal">
+  <span class="eyebrow">Tahap 2: Pengujian gambar</span>
+  <h1>Klasifikasi jenis malaria dari citra mikroskopis</h1>
+  <p>Masukkan satu gambar mikroskopis. Sistem akan memeriksa citra tersebut dan menampilkan jenis Plasmodium yang paling mungkin terdeteksi beserta nilai keyakinannya.</p>
+</section>
+
+<section class="grid two reveal">
+  <div class="card highlight-card upload-card">
+    <div class="card-head"><h2>Masukkan gambar uji</h2><span class="badge">klasifikasi</span></div>
+    <form method="post" action="{{ url_for('predict') }}" enctype="multipart/form-data" class="form predict-form simple-predict">
+      <div class="full">
+        <label>Model YOLOv8</label>
+        <input type="text" name="model_path" value="{{ defaults.best_model_display }}">
+        <small class="help-text">Gunakan model best.pt hasil training. Lokasi default: runs/malaria_yolov8/weights/best.pt.</small>
+      </div>
+
+      <input type="hidden" name="iou" value="{{ defaults.iou }}">
+      <input type="hidden" name="imgsz" value="{{ defaults.imgsz }}">
+
+      <div class="full file-panel">
+        <label>Pilih citra mikroskopis</label>
+        <input type="file" name="image" accept=".jpg,.jpeg,.png,.bmp,.tif,.tiff,.webp,image/*" required>
+        <small class="help-text">Sistem hanya menerima file gambar: JPG, JPEG, PNG, BMP, TIFF, atau WEBP.</small>
+      </div>
+
+      <div class="full">
+        <label>Batas minimal keyakinan model</label>
+        <input type="number" name="conf" value="{{ defaults.conf }}" min="0.01" max="1" step="0.01">
+        <small class="help-text">Nilai 0,25 berarti hasil utama ditampilkan jika keyakinan model minimal 25%. Jika tidak ada deteksi, sistem otomatis mengecek ulang dengan confidence 1% untuk melihat kandidat lemah.</small>
+      </div>
+
+      <button class="btn primary full" type="submit">Klasifikasikan Gambar</button>
+    </form>
+  </div>
+
+  <div class="card soft">
+    <div class="card-head"><h2>Kelas yang dapat dikenali</h2><span class="badge">5 jenis</span></div>
+    <p class="muted">Model hanya mengenali jenis malaria yang memang dilatih dalam penelitian ini.</p>
+    <div class="class-list-clean linked-class-list">
+      {% for cls in species_order %}
+        <a href="{{ url_for('species_detail', slug=species_info[cls].slug) }}">{{ species_info[cls].title }}</a>
+      {% endfor %}
+    </div>
+    <p class="note-text">Hasil sistem bersifat bantuan analisis citra, bukan pengganti diagnosis dokter atau pemeriksaan laboratorium resmi.</p>
+  </div>
+</section>
+
+{% if result %}
+<section class="card reveal result-hero premium-result">
+  <div>
+    <span class="eyebrow">Hasil klasifikasi</span>
+    <h2>{{ result.classification_label }}</h2>
+    <p class="muted">{{ result.classification_message }}</p>
+    {% if result.used_fallback %}
+      <p class="note-text">Catatan: hasil ini muncul dari pengecekan ulang confidence rendah, sehingga perlu dianggap sebagai kandidat lemah.</p>
+    {% endif %}
+  </div>
+  <div class="confidence-gauge" style="--value: {{ result.classification_confidence|default(0) }}">
+    <strong>{{ result.classification_confidence }}%</strong>
+    <span>confidence</span>
+  </div>
+</section>
+
+<section class="card reveal compare-card">
+  <div class="card-head"><h2>Before vs After</h2><span class="badge">visual output</span></div>
+  <div class="before-after-grid">
+    <figure>
+      <span>Gambar asli</span>
+      <img class="preview" src="{{ result.input_url }}" alt="gambar input">
+    </figure>
+    <figure>
+      <span>Hasil deteksi</span>
+      <img class="preview" src="{{ result.output_url }}" alt="hasil prediksi">
+    </figure>
+  </div>
+  <div class="button-row">
+    {% if result.download_url %}<a class="btn secondary" href="{{ result.download_url }}">Unduh Gambar Hasil</a>{% endif %}
+    {% if result.report_download_url %}<a class="btn ghost" href="{{ result.report_download_url }}">Export Ringkasan Hasil</a>{% endif %}
+  </div>
+</section>
+
+<section class="grid two reveal">
+  <div class="card">
+    <div class="card-head"><h2>Detail hasil</h2><span class="badge">ringkasan</span></div>
+    <div class="metric-row"><span>Model yang dipakai</span><strong>{{ result.model_path }}</strong></div>
+    <div class="metric-row"><span>Confidence utama</span><strong>{{ (result.requested_conf * 100) | round(2) }}%</strong></div>
+    <div class="metric-row"><span>Confidence yang dipakai</span><strong>{{ (result.used_conf * 100) | round(2) }}%</strong></div>
+    <div class="metric-row"><span>Ukuran gambar</span><strong>{{ result.image_width }} × {{ result.image_height }}</strong></div>
+    <div class="metric-row"><span>Jumlah area terdeteksi</span><strong>{{ result.count }}</strong></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Tabel deteksi</h2><span class="badge">bbox</span></div>
+    {% if result.count > 0 %}
+      <div class="table-wrap compact-table">
+        <table>
+          <thead><tr><th>Jenis</th><th>Keyakinan</th><th>Luas area</th></tr></thead>
+          <tbody>
+          {% for d in result.detections %}
+            <tr><td>{{ d.class_name }}</td><td>{{ (d.confidence * 100) | round(2) }}%</td><td>{{ d.area_pct }}%</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">Tidak ada area yang terdeteksi. Coba gunakan gambar mikroskopis yang lebih jelas, pastikan file best.pt berasal dari hasil training dataset malaria, dan periksa kembali label bounding box data latih.</p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

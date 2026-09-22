@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ info.title }} - Jenis Malaria{% endblock %}
+{% block content %}
+<section class="species-detail-hero card reveal" style="--species-color: {{ info.color }}">
+  <div class="species-detail-copy">
+    <a class="back-link" href="{{ url_for('species_overview') }}">← Kembali ke daftar jenis</a>
+    <span class="eyebrow">{{ class_name }}</span>
+    <h1>{{ info.title }}</h1>
+    <h2>{{ info.headline }}</h2>
+    <p>{{ info.intro }}</p>
+    <div class="species-detail-stats">
+      <div><span>Data awal proposal</span><strong>{{ info.proposal_count }}</strong><small>citra</small></div>
+      <div><span>Setelah diseimbangkan</span><strong>{{ info.target_count }}</strong><small>citra</small></div>
+    </div>
+  </div>
+  <div class="species-detail-image">
+    <img src="{{ url_for('sample_image', class_name=class_name) }}" alt="Contoh citra {{ info.title }}">
+    <span>Contoh citra dari folder dataset</span>
+  </div>
+</section>
+
+<section class="grid two reveal species-info-blocks">
+  <div class="card"><div class="card-head"><h2>Ciri pada citra mikroskopis</h2><span class="badge">visual</span></div><ul class="nice-list">{% for item in info.microscopy %}<li>{{ item }}</li>{% endfor %}</ul></div>
+  <div class="card"><div class="card-head"><h2>Makna klinis secara umum</h2><span class="badge">edukasi</span></div><ul class="nice-list">{% for item in info.clinical %}<li>{{ item }}</li>{% endfor %}</ul></div>
+</section>
+
+<section class="grid two reveal">
+  <div class="card soft"><div class="card-head"><h2>Bagaimana sistem membaca kelas ini?</h2><span class="badge">model</span></div><p class="muted">{{ info.model_note }}</p><div class="simple-flow"><span>Gambar masuk</span><b>→</b><span>YOLOv8 mencari area</span><b>→</b><span>Model memilih kelas</span><b>→</b><span>Hasil + keyakinan</span></div></div>
+  <div class="card soft"><div class="card-head"><h2>Ringkasan mudah</h2><span class="badge">cepat</span></div><div class="summary-boxes"><div><span>Nama pendek</span><strong>{{ class_name }}</strong></div><div><span>Nama ilmiah</span><strong>{{ info.title }}</strong></div><div><span>Target data</span><strong>{{ info.target_count }} citra</strong></div></div></div>
+</section>
+
+<section class="card reveal source-card"><div class="card-head"><h2>Sumber ringkas</h2><span class="badge">referensi</span></div><p class="muted">Ringkasan spesies disusun dari rujukan umum WHO dan CDC/DPDx mengenai malaria serta spesies Plasmodium penyebab malaria pada manusia. Halaman ini bersifat edukatif untuk pendukung penelitian, bukan panduan diagnosis klinis mandiri.</p></section>
+{% endblock %}

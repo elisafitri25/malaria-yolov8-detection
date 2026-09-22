@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malaria YOLOv8 Detection</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+        .navbar {
+            background: #1f3b63;
+            color: white;
+            padding: 18px 42px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 18px;
+            font-size: 14px;
+        }
+        .hero {
+            padding: 70px 42px;
+            background: linear-gradient(135deg, #1f3b63, #5f78a8);
+            color: white;
+        }
+        .hero h1 {
+            max-width: 850px;
+            font-size: 42px;
+            margin: 0 0 18px 0;
+            line-height: 1.2;
+        }
+        .hero p {
+            max-width: 760px;
+            font-size: 18px;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 13px 22px;
+            background: white;
+            color: #1f3b63;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .btn.secondary {
+            background: #dbeafe;
+        }
+        .section {
+            padding: 42px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 18px;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #1f3b63;
+        }
+        .card a {
+            color: #1f3b63;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .status {
+            background: #eef2ff;
+            border-left: 5px solid #5f78a8;
+            padding: 16px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        footer {
+            padding: 24px 42px;
+            color: #64748b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div><strong>Malaria YOLOv8</strong></div>
+        <div>
+            <a href="{{ url_for('index') }}">Beranda</a>
+            <a href="{{ url_for('dataset') }}">Dataset</a>
+            <a href="{{ url_for('predict') }}">Prediksi</a>
+            <a href="{{ url_for('species_overview') }}">Jenis Malaria</a>
+            <a href="{{ url_for('math_page') }}">Model Matematis</a>
+            <a href="{{ url_for('blackbox_testing') }}">Blackbox</a>
+        </div>
+    </div>
+
+    <div class="hero">
+        <h1>Sistem Deteksi Jenis Malaria Berbasis YOLOv8</h1>
+        <p>
+            Aplikasi ini digunakan untuk menyiapkan dataset, melakukan pengujian citra mikroskopis,
+            menampilkan hasil deteksi bounding box, serta mendukung dokumentasi penelitian berbasis YOLOv8.
+        </p>
+        <a class="btn" href="{{ url_for('predict') }}">Mulai Prediksi</a>
+        <a class="btn secondary" href="{{ url_for('dataset') }}">Kelola Dataset</a>
+
+        <div class="status">
+            <strong>Status sistem:</strong>
+            {{ state.message if state and state.message else "Aplikasi siap digunakan." }}
+            <br>
+            <strong>Model aktif:</strong> {{ best_model }}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="grid">
+            <div class="card">
+                <h3>Dataset</h3>
+                <p>Melihat status dataset, hasil augmentasi, dan file YOLO Ready.</p>
+                <a href="{{ url_for('dataset') }}">Buka Dataset</a>
+            </div>
+
+            <div class="card">
+                <h3>Prediksi Citra</h3>
+                <p>Unggah gambar mikroskopis dan jalankan deteksi menggunakan model best.pt.</p>
+                <a href="{{ url_for('predict') }}">Buka Prediksi</a>
+            </div>
+
+            <div class="card">
+                <h3>Jenis Malaria</h3>
+                <p>Informasi singkat spesies Falciparum, Knowlesi, Malariae, Ovale, dan Vivax.</p>
+                <a href="{{ url_for('species_overview') }}">Lihat Jenis</a>
+            </div>
+
+            <div class="card">
+                <h3>Model Matematis</h3>
+                <p>Penjelasan normalisasi, bounding box, confidence, IoU, precision, recall, dan mAP.</p>
+                <a href="{{ url_for('math_page') }}">Lihat Rumus</a>
+            </div>
+
+            <div class="card">
+                <h3>Blackbox Testing</h3>
+                <p>Halaman pendukung untuk pengujian fungsi sistem.</p>
+                <a href="{{ url_for('blackbox_testing') }}">Buka Pengujian</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Sistem lokal YOLOv8 Malaria Detection.
+    </footer>
+
+</body>
+</html>

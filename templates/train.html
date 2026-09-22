@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Pelatihan Model - Sistem Deteksi Malaria{% endblock %}
+{% block content %}
+<section class="page-title reveal">
+  <span class="eyebrow">Pelatihan model</span>
+  <h1>Pelatihan dilakukan melalui terminal</h1>
+  <p>Halaman pelatihan tidak ditampilkan pada navigasi website. Gunakan terminal VS Code untuk melatih ulang model.</p>
+</section>
+<section class="card reveal">
+  <div class="card-head"><h2>Perintah terminal</h2><span class="badge">VS Code</span></div>
+  <pre class="code-block"><code>python tools/train_from_terminal.py --model yolov8s.pt --epochs 150 --imgsz 832 --batch 4 --device cpu</code></pre>
+  <p class="muted">File best.pt akan dicari oleh halaman klasifikasi pada folder runs/malaria_yolov8/weights.</p>
+</section>
+{% endblock %}

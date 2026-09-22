@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Sistem Deteksi Malaria YOLOv8{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <div class="scroll-progress" aria-hidden="true"></div>
+    <div class="cursor-glow" aria-hidden="true"></div>
+    <div class="motion-dots" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="bg-orb orb-one" aria-hidden="true"></div>
+    <div class="bg-orb orb-two" aria-hidden="true"></div>
+    <div class="bg-orb orb-three" aria-hidden="true"></div>
+
+    <button class="mobile-menu" type="button" data-menu-toggle aria-label="Buka menu"><span></span><span></span><span></span></button>
+
+    <aside class="sidebar" data-sidebar>
+      <button class="brand author-trigger" type="button" data-author-open aria-label="Informasi penulis">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="img">
+            <path
+              d="M12 12.2c2.7 0 4.8-2.2 4.8-4.8S14.7 2.6 12 2.6 7.2 4.8 7.2 7.4s2.1 4.8 4.8 4.8Zm0 2.1c-3.4 0-7.2 1.7-7.2 5.1 0 .8.6 1.4 1.4 1.4h11.6c.8 0 1.4-.6 1.4-1.4 0-3.4-3.8-5.1-7.2-5.1Z"
+            />
+          </svg>
+        </span>
+        <span>
+          <span class="brand-title">Malaria Detection</span>
+          <span class="brand-subtitle">YOLOv8 research app</span>
+        </span>
+      </button>
+
+      <nav class="nav" aria-label="Navigasi utama">
+        <a href="{{ url_for('index') }}" class="nav-link"><span class="nav-ico">⌂</span>Beranda</a>
+        <a href="{{ url_for('dashboard') }}" class="nav-link"><span class="nav-ico">◈</span>Dashboard</a>
+        <a href="{{ url_for('dataset') }}" class="nav-link"><span class="nav-ico">▦</span>Olah Data</a>
+        <a href="{{ url_for('predict') }}" class="nav-link"><span class="nav-ico">◎</span>Klasifikasi</a>
+        <a href="{{ url_for('species_overview') }}" class="nav-link"><span class="nav-ico">✦</span>Jenis Malaria</a>
+        <a href="{{ url_for('math_page') }}" class="nav-link"><span class="nav-ico">∑</span>Rumus</a>
+        <a href="{{ url_for('blackbox_testing') }}" class="nav-link"><span class="nav-ico">✓</span>Black Box</a>
+      </nav>
+
+      <div class="side-note">
+        <div class="side-note-top"><span class="dot"></span><strong>Alur sistem</strong></div>
+        <p>Data → Augmentasi → YOLO Ready → Model → Klasifikasi.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar glass">
+        <div class="topbar-left">
+          <div class="crumb">Sistem deteksi malaria</div>
+          <div class="path">Dashboard › Dataset › Klasifikasi › Rumus › Black Box Testing</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="Ganti tema">☾</button>
+          <button class="author-chip" type="button" data-author-open>
+            <span class="author-avatar" aria-hidden="true">ES</span>
+            <span>Penulis</span>
+          </button>
+        </div>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
+      <section class="alerts">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </section>
+      {% endif %} {% endwith %}
+
+      <div class="page-shell">{% block content %}{% endblock %}</div>
+    </main>
+
+    <div class="author-modal" data-author-modal aria-hidden="true">
+      <div class="author-backdrop" data-author-close></div>
+      <section class="author-card" role="dialog" aria-modal="true" aria-labelledby="author-title">
+        <button class="modal-close" type="button" data-author-close aria-label="Tutup">×</button>
+        <div class="modal-icon profile-avatar-large" aria-hidden="true">ES</div>
+        <span class="eyebrow">Informasi penulis</span>
+        <h2 id="author-title">Eli Safitri</h2>
+        <div class="author-info-grid">
+          <div><span>NIM</span><strong>4223250007</strong></div>
+          <div><span>Program Studi</span><strong>Ilmu Komputer</strong></div>
+          <div><span>Jurusan</span><strong>Matematika</strong></div>
+          <div><span>Fakultas</span><strong>FMIPA, Universitas Negeri Medan</strong></div>
+        </div>
+        <p>Dosen Pembimbing: Susiana, S.Si., M.Si.</p>
+        <p>Penelitian: Implementasi Algoritma YOLOv8 untuk Deteksi Penyakit Malaria Menggunakan Citra Sel Darah.</p>
+      </section>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay" aria-hidden="true">
+      <div class="loader-card">
+        <div class="spinner"></div>
+        <strong>Sedang diproses...</strong>
+        <span>Proses sedang berjalan. Mohon tunggu sampai selesai.</span>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>

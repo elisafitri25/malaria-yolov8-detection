@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Rumus Penelitian - Sistem Deteksi Malaria{% endblock %}
+{% block content %}
+<section class="page-title reveal">
+  <span class="eyebrow">Rumus penelitian</span>
+  <h1>Rumus penting dalam penelitian</h1>
+  <p>Bagian ini memakai tampilan formula visual agar rumus tidak terlihat seperti catatan plain text yang baru bangun tidur.</p>
+</section>
+
+<section class="card reveal math-hero formula-dashboard">
+  <div>
+    <h2>Target penyeimbangan data</h2>
+    <p class="muted">Lima kelas diarahkan memiliki jumlah citra yang sama sebelum training.</p>
+  </div>
+  <div class="formula-big"><span>{{ jumlah_kelas|default(5) }} × {{ target_per_class|default(1000) }}</span><b>= {{ target_total|default(5000) }} citra</b></div>
+</section>
+
+<section class="grid two reveal math-grid">
+  <div class="card formula-card visual-card">
+    <h2>1. Jumlah data awal</h2>
+    <p>Jumlah data dihitung dari seluruh kelas.</p>
+    <div class="formula-display"><b>N</b><span>=</span><span>Vivax + Falciparum + Malariae + Ovale + Knowlesi</span></div>
+    <div class="calc-line"><span>Hasil</span><strong>N = {{ total_awal|default(3275) }} citra</strong></div>
+  </div>
+
+  <div class="card formula-card visual-card">
+    <h2>2. Kebutuhan augmentasi</h2>
+    <p>Kelas yang kurang dari target ditambah melalui augmentasi.</p>
+    <div class="formula-display"><b>A<sub>k</sub></b><span>=</span><span>Target − N<sub>k</sub></span></div>
+    <div class="calc-line"><span>Contoh Knowlesi</span><strong>1000 − 184 = 816 citra</strong></div>
+  </div>
+
+  <div class="card formula-card visual-card">
+    <h2>3. Pengurangan data berlebih</h2>
+    <p>Kelas yang melebihi target dipilih acak sampai jumlahnya sama.</p>
+    <div class="formula-display"><b>U<sub>k</sub></b><span>=</span><span>N<sub>k</sub> − Target</span></div>
+    <div class="calc-line"><span>Contoh Vivax</span><strong>1425 − 1000 = 425 citra</strong></div>
+  </div>
+
+  <div class="card formula-card visual-card">
+    <h2>4. Split dataset</h2>
+    <p>Data akhir dibagi untuk training, validation, dan testing.</p>
+    <div class="split-cards animated-split">
+      <div><span>Training</span><strong>{{ train_ratio|default(80) }}%</strong><small>{{ train_total|default(4000) }} citra</small></div>
+      <div><span>Validation</span><strong>{{ val_ratio|default(10) }}%</strong><small>{{ val_total|default(500) }} citra</small></div>
+      <div><span>Testing</span><strong>{{ test_ratio|default(10) }}%</strong><small>{{ test_total|default(500) }} citra</small></div>
+    </div>
+  </div>
+
+  <div class="card formula-card visual-card">
+    <h2>5. Normalisasi piksel</h2>
+    <p>Nilai piksel dibuat berada pada rentang 0 sampai 1.</p>
+    <div class="fraction-formula"><b>p<sub>normal</sub></b><span>=</span><span class="fraction"><em>p</em><em>255</em></span></div>
+    <div class="calc-line"><span>Contoh</span><strong>128 ÷ 255 = {{ pixel_normal|default('0,502') }}</strong></div>
+  </div>
+
+  <div class="card formula-card visual-card">
+    <h2>6. Format kotak YOLO</h2>
+    <p>YOLO menyimpan kelas, titik tengah, lebar, dan tinggi.</p>
+    <div class="bbox-demo">
+      <div class="bbox-canvas"><span class="bbox-box"><i></i></span></div>
+      <div class="formula-display compact"><b>b</b><span>=</span><span>(kelas, x<sub>tengah</sub>, y<sub>tengah</sub>, lebar, tinggi)</span></div>
+    </div>
+  </div>
+
+  <div class="card formula-card visual-card">
+    <h2>7. Confidence</h2>
+    <p>Confidence menunjukkan keyakinan model terhadap objek dan kelas.</p>
+    <div class="formula-display"><b>Confidence</b><span>=</span><span>P(objek) × P(kelas | objek)</span></div>
+    <div class="calc-line"><span>Contoh</span><strong>{{ objectness|default('0,90') }} × {{ class_probability|default('0,80') }} = {{ confidence|default('0,72') }}</strong></div>
+  </div>
+
+  <div class="card formula-card visual-card">
+    <h2>8. Intersection over Union</h2>
+    <p>IoU membandingkan kotak prediksi dan kotak label.</p>
+    <div class="iou-visual">
+      <div class="iou-box label-box">Label</div>
+      <div class="iou-box pred-box">Prediksi</div>
+    </div>
+    <div class="fraction-formula"><b>IoU</b><span>=</span><span class="fraction"><em>Area irisan</em><em>Area gabungan</em></span></div>
+    <div class="calc-line"><span>Contoh</span><strong>{{ area_irisan|default(50) }} ÷ {{ area_gabungan|default(120) }} = {{ iou|default('0,417') }}</strong></div>
+  </div>
+
+  <div class="card formula-card visual-card">
+    <h2>9. Precision, recall, dan F1</h2>
+    <p>Metrik ini menilai ketepatan dan kelengkapan deteksi.</p>
+    <div class="confusion-mini">
+      <div><span>TP</span><strong>{{ tp|default(90) }}</strong></div>
+      <div><span>FP</span><strong>{{ fp|default(10) }}</strong></div>
+      <div><span>FN</span><strong>{{ fn|default(15) }}</strong></div>
+    </div>
+    <div class="metric-formulas">
+      <span>Precision = TP ÷ (TP + FP) = {{ precision|default('0,900') }}</span>
+      <span>Recall = TP ÷ (TP + FN) = {{ recall|default('0,857') }}</span>
+      <span>F1 = 2 × Precision × Recall ÷ (Precision + Recall) = {{ f1_score|default('0,878') }}</span>
+    </div>
+  </div>
+
+  <div class="card formula-card visual-card wide">
+    <h2>10. Mean Average Precision</h2>
+    <p>mAP merangkum performa seluruh kelas Plasmodium.</p>
+    <div class="formula-display"><b>mAP</b><span>=</span><span>(AP<sub>1</sub> + AP<sub>2</sub> + AP<sub>3</sub> + AP<sub>4</sub> + AP<sub>5</sub>) ÷ 5</span></div>
+    <div class="ap-strip">
+      {% for value in ap_values|default(['0,91','0,88','0,86','0,84','0,90']) %}
+      <span>{{ value }}</span>
+      {% endfor %}
+    </div>
+    <div class="calc-line"><span>Hasil contoh</span><strong>mAP = {{ map_value|default('0,878') }}</strong></div>
+  </div>
+</section>
+{% endblock %}

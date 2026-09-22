@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Olah Data - Sistem Deteksi Malaria{% endblock %}
+{% block content %}
+<section class="page-title reveal">
+  <span class="eyebrow">Tahap 1: Persiapan data</span>
+  <h1>Perbanyak dan seimbangkan data citra malaria</h1>
+  <p>Halaman ini menyiapkan dataset agar setiap kelas memiliki jumlah citra yang sama dan dapat dibaca oleh format YOLO.</p>
+</section>
+
+<section class="card reveal pipeline-card">
+  <div class="card-head"><h2>Progress pipeline data</h2><span class="badge pulse">dinamis</span></div>
+  <div class="pipeline-flow compact">
+    <div class="pipe-step done"><span>1</span><strong>Infected</strong><small>data awal</small></div>
+    <div class="pipe-line"></div>
+    <div class="pipe-step {{ 'done' if augmented_status.ready else 'wait' }}"><span>2</span><strong>Augmented</strong><small>seimbang</small></div>
+    <div class="pipe-line"></div>
+    <div class="pipe-step"><span>3</span><strong>YOLO Ready</strong><small>80:10:10</small></div>
+    <div class="pipe-line"></div>
+    <div class="pipe-step"><span>4</span><strong>Klasifikasi</strong><small>best.pt</small></div>
+  </div>
+</section>
+
+<section class="workflow-card card reveal">
+  <div class="workflow-head">
+    <div><h2>Alur kerja data</h2><p class="muted">Label sudah tersedia, sehingga proses berfokus pada penyeimbangan data dan penyusunan struktur YOLO.</p></div>
+    <span class="badge pulse">siap diproses</span>
+  </div>
+  <div class="steps">
+    <div class="step active"><span>1</span><strong>Periksa data</strong><small>Cek gambar dan label</small></div>
+    <div class="step"><span>2</span><strong>Seimbangkan</strong><small>Target 1.000 citra per kelas</small></div>
+    <div class="step"><span>3</span><strong>Susun YOLO</strong><small>Training, validation, testing</small></div>
+    <div class="step"><span>4</span><strong>Gunakan model</strong><small>Model best.pt dipakai pada halaman klasifikasi</small></div>
+  </div>
+</section>
+
+<section class="card reveal scenario-card">
+  <div class="card-head"><h2>Rencana penyeimbangan data</h2><span class="badge">{{ proposal_total }} → {{ target_total }} citra</span></div>
+  <p class="muted">Data awal belum seimbang, lalu diarahkan menjadi 1.000 citra untuk setiap jenis Plasmodium.</p>
+  <div class="augment-summary">
+    <div class="summary-pill"><span>Data awal</span><strong data-counter="{{ proposal_total }}">{{ proposal_total }}</strong><small>citra</small></div>
+    <div class="summary-arrow">→</div>
+    <div class="summary-pill good"><span>Target akhir</span><strong data-counter="{{ target_total }}">{{ target_total }}</strong><small>citra</small></div>
+  </div>
+  <div class="aug-table-wrap">
+    <table class="aug-table">
+      <thead><tr><th>Jenis malaria</th><th>Sebelum</th><th>Proses</th><th>Sesudah</th></tr></thead>
+      <tbody>
+      {% for cls in ["Vivax", "Falciparum", "Malariae", "Ovale", "Knowlesi"] %}
+        {% set row = augmentation_plan[cls] %}
+        <tr><td><strong>{{ cls }}</strong></td><td>{{ row.awal }} citra</td><td><span class="process-tag {{ row.jenis|replace(' ', '-') }}">{{ row.aksi }}</span></td><td><b>{{ row.akhir }} citra</b></td></tr>
+      {% endfor %}
+      </tbody>
+      <tfoot><tr><td><strong>Total</strong></td><td>{{ proposal_total }} citra</td><td>Diseimbangkan</td><td>{{ target_total }} citra</td></tr></tfoot>
+    </table>
+  </div>
+</section>
+
+<section class="grid two reveal status-grid">
+  <div class="card status-card {{ 'ready' if data_status.ready else 'warn' }}">
+    <div class="card-head"><h2>Kesiapan data awal</h2><span class="badge">cek otomatis</span></div>
+    <div class="big-status">{{ data_status.title }}</div>
+    <p class="muted">{{ data_status.message }}</p>
+  </div>
+  <div class="card status-card {{ 'ready' if augmented_status.ready else 'warn' }}">
+    <div class="card-head"><h2>Hasil penyeimbangan</h2><span class="badge">target {{ target_total }}</span></div>
+    <div class="big-status">{{ augmented_status.title }}</div>
+    <p class="muted">{{ augmented_status.message }}</p>
+    <div class="mini-targets"><span>Falciparum 1.000</span><span>Knowlesi 1.000</span><span>Malariae 1.000</span><span>Ovale 1.000</span><span>Vivax 1.000</span></div>
+  </div>
+</section>
+
+<section class="grid two reveal">
+  <div class="card highlight-card">
+    <div class="card-head"><h2>Mulai penyeimbangan data</h2><span class="badge">augmentasi</span></div>
+    <p class="muted">Sistem membuat variasi citra baru. Kotak label ikut menyesuaikan agar tetap cocok dengan gambar.</p>
+    <form method="post" action="{{ url_for('run_augmentation_route') }}" class="form">
+      <label>Target akhir setiap kelas</label>
+      <input type="number" name="target" value="{{ target_per_class }}" min="1" max="20000">
+      <label class="check"><input type="checkbox" name="clean_output" checked> Buat ulang hasil dari awal</label>
+      <button class="btn primary" type="submit">Mulai Proses</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>Susun struktur YOLO</h2><span class="badge">80:10:10</span></div>
+    <p class="muted">Data hasil penyeimbangan disusun menjadi folder training, validation, dan testing.</p>
+    <form method="post" action="{{ url_for('prepare_yolo_route') }}" class="form">
+      <button class="btn secondary" type="submit">Susun Data YOLO</button>
+    </form>
+    <p class="note-text">Pelatihan ulang model dilakukan dari terminal VS Code, bukan dari menu website.</p>
+  </div>
+</section>
+
+<section class="card soft reveal">
+  <div class="card-head"><h2>Status proses</h2><span class="badge">ringkas</span></div>
+  <div class="process-status" id="status-summary"><strong>{{ state.message }}</strong>{% if state.error %}<small>{{ state.error }}</small>{% else %}<small>Status akan diperbarui otomatis.</small>{% endif %}</div>
+</section>
+{% endblock %}

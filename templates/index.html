@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Beranda - Sistem Deteksi Malaria YOLOv8{% endblock %}
+{% block content %}
+<section class="hero card reveal premium-hero">
+  <div class="hero-copy">
+    <span class="eyebrow">Skenario penelitian</span>
+    <h1>Deteksi spesies <span>Plasmodium</span> berbasis YOLOv8</h1>
+    <p>Aplikasi ini membantu membaca citra sel darah merah, menampilkan area deteksi, label jenis Plasmodium, dan nilai confidence secara ringkas.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="{{ url_for('dashboard') }}">Buka Dashboard</a>
+      <a class="btn secondary" href="{{ url_for('predict') }}">Mulai Klasifikasi</a>
+      <a class="btn ghost" href="{{ url_for('math_page') }}">Lihat Rumus</a>
+    </div>
+  </div>
+  <div class="hero-visual" aria-hidden="true">
+    <div class="scan-frame"></div>
+    <div class="pulse-ring ring-a"></div>
+    <div class="pulse-ring ring-b"></div>
+    <div class="micro-card float-one"><strong data-counter="{{ proposal_total }}">{{ proposal_total }}</strong><span>citra awal</span></div>
+    <div class="micro-card float-two"><strong data-counter="{{ target_total }}">{{ target_total }}</strong><span>target akhir</span></div>
+    <div class="class-chips clickable-chips">
+      {% for cls in species_order %}
+        <a href="{{ url_for('species_detail', slug=species_info[cls].slug) }}">{{ cls }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="metric-strip reveal">
+  <div class="metric-card"><span>Data awal</span><strong data-counter="{{ proposal_total }}">{{ proposal_total }}</strong><small>citra</small></div>
+  <div class="metric-card"><span>Jumlah kelas</span><strong data-counter="5">5</strong><small>spesies</small></div>
+  <div class="metric-card"><span>Target per kelas</span><strong data-counter="{{ target_per_class }}">{{ target_per_class }}</strong><small>citra</small></div>
+  <div class="metric-card"><span>Total target</span><strong data-counter="{{ target_total }}">{{ target_total }}</strong><small>citra</small></div>
+</section>
+
+<section class="card reveal scenario-card">
+  <div class="card-head"><h2>Distribusi data awal</h2><span class="badge">tidak seimbang</span></div>
+  <p class="muted">Jumlah citra setiap kelas berbeda, sehingga data perlu diseimbangkan sebelum model digunakan untuk proses penelitian.</p>
+  <div class="distribution-list">
+    {% for cls in ["Vivax", "Falciparum", "Malariae", "Ovale", "Knowlesi"] %}
+    {% set count = proposal_counts[cls] %}
+    <div class="dist-row">
+      <div class="dist-meta"><strong>{{ cls }}</strong><span>{{ count }} citra</span></div>
+      <div class="dist-bar"><i style="width: {{ (count / proposal_total * 100) | round(1) }}%"></i></div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="grid two reveal">
+  <div class="card balance-card">
+    <div class="card-head"><h2>Sebelum diseimbangkan</h2><span class="badge">{{ proposal_total }} citra</span></div>
+    <p class="muted">Jumlah citra belum merata. Model dapat lebih sering mengenali kelas yang jumlahnya paling besar.</p>
+    <div class="simple-equation"><span>1425 + 918 + 436 + 312 + 184</span><b>= {{ proposal_total }}</b></div>
+  </div>
+  <div class="card balance-card good">
+    <div class="card-head"><h2>Setelah diseimbangkan</h2><span class="badge">{{ target_total }} citra</span></div>
+    <p class="muted">Setiap kelas diarahkan menjadi 1.000 citra agar proses belajar model lebih merata.</p>
+    <div class="simple-equation"><span>5 kelas × 1000 citra</span><b>= {{ target_total }}</b></div>
+  </div>
+</section>
+
+<section class="grid three reveal">
+  <a class="action-card" href="{{ url_for('dashboard') }}"><span>00</span><h3>Dashboard</h3><p>Lihat status data, model, dan kesiapan sistem.</p></a>
+  <a class="action-card" href="{{ url_for('dataset') }}"><span>01</span><h3>Olah data</h3><p>Susun dataset dan siapkan format YOLO.</p></a>
+  <a class="action-card" href="{{ url_for('predict') }}"><span>02</span><h3>Klasifikasi gambar</h3><p>Unggah citra, lalu lihat label dan confidence.</p></a>
+</section>
+{% endblock %}

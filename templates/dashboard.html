@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Sistem Deteksi Malaria YOLOv8{% endblock %}
+{% block content %}
+<section class="page-title reveal dashboard-title">
+  <span class="eyebrow">Dashboard ringkas</span>
+  <h1>Monitoring kesiapan sistem deteksi malaria</h1>
+  <p>Ringkasan status dataset, model, dan alur kerja utama pada sistem deteksi malaria.</p>
+</section>
+
+<section class="dashboard-metrics reveal">
+  <div class="dash-metric-card {{ 'good' if data_status.ready else 'warn' }}"><span>Data awal</span><strong>{{ data_status.title }}</strong><small>Folder Infected</small></div>
+  <div class="dash-metric-card {{ 'good' if augmented_status.ready else 'warn' }}"><span>Augmentasi</span><strong>{{ augmented_status.title }}</strong><small>Folder Augmented</small></div>
+  <div class="dash-metric-card {{ 'good' if model_info.exists else 'warn' }}"><span>Model</span><strong>{{ 'Tersedia' if model_info.exists else 'Belum ditemukan' }}</strong><small>{{ model_info.display_path }}</small></div>
+  <div class="dash-metric-card {{ 'good' if yaml_info.exists else 'warn' }}"><span>Dataset YAML</span><strong>{{ 'Siap' if yaml_info.exists else 'Belum siap' }}</strong><small>{{ yaml_info.display_path }}</small></div>
+</section>
+
+<section class="card reveal pipeline-card">
+  <div class="card-head"><h2>Pipeline penelitian</h2><span class="badge">alur aktif</span></div>
+  <div class="pipeline-flow">
+    <div class="pipe-step done"><span>1</span><strong>Data awal</strong><small>Infected</small></div>
+    <div class="pipe-line"></div>
+    <div class="pipe-step {{ 'done' if augmented_status.ready else 'wait' }}"><span>2</span><strong>Augmentasi</strong><small>Augmented</small></div>
+    <div class="pipe-line"></div>
+    <div class="pipe-step {{ 'done' if yaml_info.exists else 'wait' }}"><span>3</span><strong>YOLO Ready</strong><small>dataset.yaml</small></div>
+    <div class="pipe-line"></div>
+    <div class="pipe-step {{ 'done' if model_info.exists else 'wait' }}"><span>4</span><strong>Model</strong><small>best.pt</small></div>
+    <div class="pipe-line"></div>
+    <div class="pipe-step"><span>5</span><strong>Klasifikasi</strong><small>Upload citra</small></div>
+  </div>
+</section>
+
+<section class="grid two reveal">
+  <div class="card model-card">
+    <div class="card-head"><h2>Status model</h2><span class="badge">YOLOv8</span></div>
+    <div class="model-orb {{ 'active' if model_info.exists else 'inactive' }}">
+      <span>{{ 'ON' if model_info.exists else 'OFF' }}</span>
+    </div>
+    <div class="metric-row"><span>Nama file</span><strong>{{ model_info.name }}</strong></div>
+    <div class="metric-row"><span>Ukuran</span><strong>{{ model_info.size_mb }} MB</strong></div>
+    <div class="metric-row"><span>Lokasi relatif</span><strong>{{ model_info.display_path }}</strong></div>
+  </div>
+
+  <div class="card quick-card">
+    <div class="card-head"><h2>Aksi cepat</h2><span class="badge">shortcut</span></div>
+    <div class="quick-actions">
+      <a class="btn primary full" href="{{ url_for('predict') }}">Klasifikasi Gambar</a>
+      <a class="btn secondary full" href="{{ url_for('dataset') }}">Kelola Dataset</a>
+      <a class="btn ghost full" href="{{ url_for('math_page') }}">Buka Rumus Visual</a>
+      <a class="btn ghost full" href="{{ url_for('blackbox_testing') }}">Black Box Testing</a>
+    </div>
+    <p class="note-text">Jika model belum tersedia, salin file <strong>best.pt</strong> ke folder <strong>runs/malaria_yolov8/weights</strong>.</p>
+  </div>
+</section>
+{% endblock %}
